@@ -229,6 +229,8 @@ class ImageFolderDataset(Dataset):
         if image.ndim == 2:
             image = image[:, :, np.newaxis] # HW => HWC
         image = image.transpose(2, 0, 1) # HWC => CHW
+        if len(image.shape) == 2 or image.shape[0] == 1:
+            image = np.squeeze(np.stack((image,) * 3, axis=0))
         return image
 
     def _load_raw_labels(self):
