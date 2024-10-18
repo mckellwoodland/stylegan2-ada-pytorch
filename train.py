@@ -547,15 +547,15 @@ def main(ctx, outdir, dry_run, **config_kwargs):
 if __name__ == "__main__":
     
     # Define the path to the torch_extensions cache directory
-    cache_dir = os.path.expanduser('~/.cache/torch_extensions')
+    # cache_dir = os.path.expanduser('~/.cache/torch_extensions')
 
     # Check if the directory exists
-    if os.path.exists(cache_dir):
+    # if os.path.exists(cache_dir):
         # Remove the directory and its contents
-        shutil.rmtree(cache_dir)
-        print(f"Removed directory: {cache_dir}")
-    else:
-        print(f"Directory does not exist: {cache_dir}")
+        # shutil.rmtree(cache_dir)
+        # print(f"Removed directory: {cache_dir}")
+    # else:
+        # print(f"Directory does not exist: {cache_dir}")
 
     main() # pylint: disable=no-value-for-parameter
 
