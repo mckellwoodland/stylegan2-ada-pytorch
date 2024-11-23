@@ -139,10 +139,12 @@ def project(
 @click.option('--seed',                   help='Random seed', type=int, default=303, show_default=True)
 @click.option('--save-video',             help='Save an mp4 video of optimization progress', type=bool, default=True, show_default=True)
 @click.option('--outdir',                 help='Where to save the output images', required=True, metavar='DIR')
+@click.option('--mode',                   help='Whether to reconstruct color (RGB) or grayscale (L) images',type=str, default='RGB', show_default=True)
 def run_projection(
     network_pkl: str,
     target_dir: str,
     outdir: str,
+    mode: str,
     save_video: bool,
     seed: int,
     num_steps: int
@@ -203,7 +205,7 @@ def run_projection(
             synth_image = G.synthesis(projected_w.unsqueeze(0), noise_mode='const')
             synth_image = (synth_image + 1) * (255/2)
             synth_image = synth_image.permute(0, 2, 3, 1).clamp(0, 255).to(torch.uint8)[0].cpu().numpy()
-            PIL.Image.fromarray(synth_image, 'RGB').save(f'{outdir}/{target_fname}')
+            PIL.Image.fromarray(synth_image, 'RGB').convert(mode).save(f'{outdir}/{target_fname}')
             # np.savez(f'{outdir}/projected_w.npz', w=projected_w.unsqueeze(0).cpu().numpy())
 
 #----------------------------------------------------------------------------
