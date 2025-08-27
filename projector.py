@@ -60,7 +60,6 @@ def project(
     url = 'https://nvlabs-fi-cdn.nvidia.com/stylegan2-ada-pytorch/pretrained/metrics/vgg16.pt'
     with dnnlib.util.open_url(url) as f:
         vgg16 = torch.jit.load(f).eval().to(device)
-
     # Features for target image.
     target_images = target.unsqueeze(0).to(device).to(torch.float32)
     if target_images.shape[2] > 256:
@@ -166,8 +165,10 @@ def run_projection(
     with dnnlib.util.open_url(network_pkl) as fp:
         G = legacy.load_network_pkl(fp)['G_ema'].requires_grad_(False).to(device) # type: ignore
 
-    for target_fname in os.listdir(target_dir):
-        if 'png' in target_fname:
+    for idx, target_fname in enumerate(os.listdir(target_dir)):
+        print(idx)
+        out_file = f'{outdir}/{target_fname}'
+        if 'png' in target_fname and not os.path.exists(out_file):
             # Load target image.
             target_pil = PIL.Image.open(os.path.join(target_dir,target_fname)).convert('RGB')
             w, h = target_pil.size
@@ -183,7 +184,7 @@ def run_projection(
                 target=torch.tensor(target_uint8.transpose([2, 0, 1]), device=device), # pylint: disable=not-callable
                 num_steps=num_steps,
                 device=device,
-                verbose=True
+                verbose=False
             )
             print (f'Elapsed: {(perf_counter()-start_time):.1f} s')
 
@@ -205,7 +206,7 @@ def run_projection(
             synth_image = G.synthesis(projected_w.unsqueeze(0), noise_mode='const')
             synth_image = (synth_image + 1) * (255/2)
             synth_image = synth_image.permute(0, 2, 3, 1).clamp(0, 255).to(torch.uint8)[0].cpu().numpy()
-            PIL.Image.fromarray(synth_image, 'RGB').convert(mode).save(f'{outdir}/{target_fname}')
+            PIL.Image.fromarray(synth_image, 'RGB').convert(mode).save(out_file)
             # np.savez(f'{outdir}/projected_w.npz', w=projected_w.unsqueeze(0).cpu().numpy())
 
 #----------------------------------------------------------------------------
